@@ -25,6 +25,7 @@ const FAB = ({ scrollOffset }: Props) => {
   const activeTab = useSharedValue<TabRoutes>("Chat");
   const [currentIcon, setCurrentIcon] = useState<icons>("messenger");
 
+  //This sets the value of the active tab based on the scroll offset
   useAnimatedReaction(
     () => scrollOffset.value,
     (p) => {
@@ -33,6 +34,7 @@ const FAB = ({ scrollOffset }: Props) => {
     }
   );
 
+  //This changes the icon when the tab changes
   useAnimatedReaction(
     () => activeTab.value,
     (p) => {
@@ -44,16 +46,6 @@ const FAB = ({ scrollOffset }: Props) => {
     transform: [
       {
         translateY: withTiming(activeTab.value === "Status" ? -70 : 0, {
-          duration: 250,
-        }),
-      },
-    ],
-  }));
-
-  const animatedCallStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        scale: withTiming(activeTab.value === "Calls" ? 1 : 0, {
           duration: 250,
         }),
       },

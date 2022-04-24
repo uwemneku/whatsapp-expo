@@ -13,6 +13,11 @@ interface Props {
   index: number;
   scrollOffset: SharedValue<number>;
 }
+
+/**
+ * Controls the opacity of the label based on the scroll offset
+ * The label is visible when the index is the same as the current index of the scrollView (i.e. the current tab where scrollOffset is at)
+ */
 const TabText = ({ index, label, scrollOffset }: Props) => {
   const { width } = useWindowDimensions();
   const animatedStyle = useAnimatedStyle(() => ({
@@ -35,7 +40,6 @@ export default TabText;
 const styles = StyleSheet.create({
   text: {
     color: "white",
-    // fontWeight: //"bold",
     fontFamily: "bold",
   },
 });
