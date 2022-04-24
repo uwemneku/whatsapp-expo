@@ -2,12 +2,23 @@
 
 The goal of this project is to create a simple clone of whatsapp. The focus is on using reanimated 2 to implement the animations.
 
-# Getting started
+## Features
+
+- [X] [Custom Top Tab Bar](./src/screens/Tab/index.tsx)
+- [X] [Custom Floating action button](./src/screens/Tab/components/FAB.tsx)
+
+<br/>
+
+## Getting started
+
 - Clone the repo
+  
     ```bash
     git clone https://github.com/uwemneku/whatsapp-expo.git
     ```
+
 - Install dependencies
+  
     ```bash
         npm install
     ```
@@ -16,7 +27,9 @@ The goal of this project is to create a simple clone of whatsapp. The focus is o
     ```bash
         yarn
     ```
+
 - Start the app
+  
     ```bash
         yarn start
     ```
