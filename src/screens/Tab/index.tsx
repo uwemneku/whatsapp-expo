@@ -3,14 +3,12 @@ import {
   ScrollView,
   StatusBar,
   StyleSheet,
-  Text,
   useWindowDimensions,
   View,
 } from "react-native";
 import React, { useCallback, useEffect, useRef } from "react";
 import TabHeader from "./components/TabHeader";
 import Animated, {
-  useAnimatedReaction,
   useAnimatedScrollHandler,
   useSharedValue,
 } from "react-native-reanimated";
@@ -19,9 +17,7 @@ import Chats from "./Chats";
 import Camera from "./Camera";
 import Status from "./Status";
 import FAB from "./components/FAB";
-import { TabRoutes } from "../../types";
-
-const screens: TabRoutes[] = ["Camera", "Chat", "Status", "Calls"];
+import { CurrentTabContext } from "../../context";
 
 const HomeTab = () => {
   const scrollOffset = useSharedValue(0);
@@ -65,21 +61,23 @@ const HomeTab = () => {
     <View style={styles.container}>
       <StatusBar backgroundColor={"#008069"} />
       <TabHeader {...{ scrollOffset, scrollToIndex }} />
-      <Animated.ScrollView
-        ref={scrollRef}
-        onScroll={scrollHandler}
-        horizontal
-        snapToAlignment={"center"}
-        snapToInterval={width}
-        contentOffset={{ x: width, y: 0 }}
-        disableIntervalMomentum
-        showsHorizontalScrollIndicator={false}
-      >
-        <Camera />
-        <Chats />
-        <Status />
-        <Calls />
-      </Animated.ScrollView>
+      <CurrentTabContext.Provider value={currentIndex}>
+        <Animated.ScrollView
+          ref={scrollRef}
+          onScroll={scrollHandler}
+          horizontal
+          snapToAlignment={"center"}
+          snapToInterval={width}
+          contentOffset={{ x: width, y: 0 }}
+          disableIntervalMomentum
+          showsHorizontalScrollIndicator={false}
+        >
+          <Camera />
+          <Chats />
+          <Status />
+          <Calls />
+        </Animated.ScrollView>
+      </CurrentTabContext.Provider>
       <FAB {...{ scrollOffset }} />
     </View>
   );

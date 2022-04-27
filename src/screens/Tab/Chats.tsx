@@ -5,7 +5,7 @@ const Chats = () => {
   const { width } = useWindowDimensions();
 
   return (
-    <View style={{ width }}>
+    <View style={{ width, backgroundColor: "red" }}>
       <Text>Chats</Text>
     </View>
   );
