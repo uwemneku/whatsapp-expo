@@ -9,7 +9,10 @@ import {
 import React, { useCallback, useEffect, useRef } from "react";
 import TabHeader from "./components/TabHeader";
 import Animated, {
+  Extrapolate,
+  interpolate,
   useAnimatedScrollHandler,
+  useAnimatedStyle,
   useSharedValue,
 } from "react-native-reanimated";
 import Calls from "./Calls";
@@ -39,6 +42,20 @@ const HomeTab = () => {
       currentIndex.value = Math.abs(Math.round(scrollOffset.value / width));
     },
   });
+
+  //move the FAB component out of the way when the user is on the Camera screen
+  const animatedFABContainerStyle = useAnimatedStyle(() => ({
+    transform: [
+      {
+        translateX: interpolate(
+          scrollOffset.value,
+          [0, width],
+          [width, 0],
+          Extrapolate.CLAMP
+        ),
+      },
+    ],
+  }));
 
   useEffect(() => {
     //Event listener to scroll back to the chat screen when the user presses the back button
@@ -77,8 +94,10 @@ const HomeTab = () => {
           <Status />
           <Calls />
         </Animated.ScrollView>
+        <Animated.View style={[animatedFABContainerStyle]}>
+          <FAB />
+        </Animated.View>
       </CurrentTabContext.Provider>
-      <FAB {...{ scrollOffset }} />
     </View>
   );
 };

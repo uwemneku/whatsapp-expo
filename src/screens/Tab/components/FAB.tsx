@@ -1,5 +1,5 @@
 import { StyleSheet, useWindowDimensions, View } from "react-native";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Animated, {
   Extrapolate,
   interpolate,
@@ -13,32 +13,21 @@ import Animated, {
 import { TabRoutes } from "../../../types";
 import { TAB_SCREENS } from "../../../constants";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-
-interface Props {
-  scrollOffset: SharedValue<number>;
-}
+import { CurrentTabContext } from "../../../context";
 
 type icons = "add-ic-call" | "photo-camera" | "messenger";
 
-const FAB = ({ scrollOffset }: Props) => {
-  const { width } = useWindowDimensions();
+const FAB = () => {
   const activeTab = useSharedValue<TabRoutes>("Chat");
   const [currentIcon, setCurrentIcon] = useState<icons>("messenger");
+  const currentIndex = useContext(CurrentTabContext);
 
   //This sets the value of the active tab based on the scroll offset
   useAnimatedReaction(
-    () => scrollOffset.value,
+    () => currentIndex.value,
     (p) => {
-      const currentIndex = Math.abs(Math.round(p / width));
-      activeTab.value = TAB_SCREENS[currentIndex];
-    }
-  );
-
-  //This changes the icon when the tab changes
-  useAnimatedReaction(
-    () => activeTab.value,
-    (p) => {
-      runOnJS(setCurrentIcon)(getIcon(p));
+      activeTab.value = TAB_SCREENS[p];
+      runOnJS(setCurrentIcon)(getIcon(activeTab.value));
     }
   );
 
@@ -52,29 +41,15 @@ const FAB = ({ scrollOffset }: Props) => {
     ],
   }));
 
-  //move the FAB component out of the way when the user is on the Camera screen
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateX: interpolate(
-          scrollOffset.value,
-          [0, width],
-          [width, 0],
-          Extrapolate.CLAMP
-        ),
-      },
-    ],
-  }));
-
   return (
-    <Animated.View style={[animatedContainerStyle]}>
+    <View>
       <View style={[styles.item, styles.green]}>
         <MaterialIcons name={currentIcon} size={24} color="white" />
       </View>
       <Animated.View style={[styles.item, styles.pen, animatedPenStyle]}>
         <Ionicons name="ios-pencil-sharp" size={30} color="gray" />
       </Animated.View>
-    </Animated.View>
+    </View>
   );
 };
 
