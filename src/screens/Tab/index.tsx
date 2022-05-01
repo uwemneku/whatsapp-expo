@@ -20,13 +20,15 @@ import Chats from "./Chats";
 import Camera from "./Camera";
 import Status from "./Status";
 import FAB from "./components/FAB";
-import { CurrentTabContext } from "../../context";
+import { CurrentTabScreenContext } from "../../context";
+import { TabRoutes } from "../../types";
+import { TAB_SCREENS } from "../../constants";
 
 const HomeTab = () => {
   const scrollOffset = useSharedValue(0);
   const { width } = useWindowDimensions();
   const scrollRef = useRef<ScrollView>(null);
-  const currentIndex = useSharedValue(0);
+  const activeTabScreenName = useSharedValue<TabRoutes>("Camera");
 
   const scrollToIndex = useCallback(
     (index: number) => {
@@ -39,7 +41,8 @@ const HomeTab = () => {
   const scrollHandler = useAnimatedScrollHandler({
     onScroll: ({ contentOffset }) => {
       scrollOffset.value = contentOffset.x;
-      currentIndex.value = Math.abs(Math.round(scrollOffset.value / width));
+      const currentIndex = Math.abs(Math.round(scrollOffset.value / width));
+      activeTabScreenName.value = TAB_SCREENS[currentIndex];
     },
   });
 
@@ -64,7 +67,7 @@ const HomeTab = () => {
     const backHandler = BackHandler.addEventListener(
       "hardwareBackPress",
       () => {
-        if (currentIndex.value === 1) {
+        if (activeTabScreenName.value === "Chat") {
           return false;
         }
         scrollToIndex(1);
@@ -77,27 +80,29 @@ const HomeTab = () => {
   return (
     <View style={styles.container}>
       <StatusBar backgroundColor={"#008069"} />
-      <TabHeader {...{ scrollOffset, scrollToIndex }} />
-      <CurrentTabContext.Provider value={currentIndex}>
-        <Animated.ScrollView
-          ref={scrollRef}
-          onScroll={scrollHandler}
-          horizontal
-          snapToAlignment={"center"}
-          snapToInterval={width}
-          contentOffset={{ x: width, y: 0 }}
-          disableIntervalMomentum
-          showsHorizontalScrollIndicator={false}
-        >
-          <Camera />
-          <Chats />
-          <Status />
-          <Calls />
-        </Animated.ScrollView>
-        <Animated.View style={[animatedFABContainerStyle]}>
+      <CurrentTabScreenContext.Provider value={activeTabScreenName}>
+        <TabHeader {...{ scrollOffset, scrollToIndex }} />
+        <View style={{ flex: 1, zIndex: 1 }}>
+          <Animated.ScrollView
+            ref={scrollRef}
+            onScroll={scrollHandler}
+            horizontal
+            snapToAlignment={"center"}
+            snapToInterval={width}
+            contentOffset={{ x: width, y: 0 }}
+            disableIntervalMomentum
+            showsHorizontalScrollIndicator={false}
+          >
+            <Camera />
+            <Chats />
+            <Status />
+            <Calls />
+          </Animated.ScrollView>
+        </View>
+        <Animated.View style={[styles.item, animatedFABContainerStyle]}>
           <FAB />
         </Animated.View>
-      </CurrentTabContext.Provider>
+      </CurrentTabScreenContext.Provider>
     </View>
   );
 };
@@ -107,5 +112,15 @@ export default HomeTab;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+  },
+  item: {
+    position: "absolute",
+    bottom: 10,
+    right: 10,
+    borderRadius: 50,
+    justifyContent: "center",
+    alignItems: "center",
+    zIndex: 100,
+    // overflow: "hidden",
   },
 });

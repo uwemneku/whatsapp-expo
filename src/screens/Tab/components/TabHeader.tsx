@@ -16,6 +16,7 @@ import TabText from "./TabText";
 import { FontAwesome, Feather, Ionicons } from "@expo/vector-icons";
 import { TAB_SCREENS } from "../../../constants";
 import { Divider, Text } from "../../../components";
+import Menu from "./Menu";
 
 interface Props {
   scrollOffset: SharedValue<number>;
@@ -65,7 +66,7 @@ const TabHeader = ({ scrollOffset, scrollToIndex }: Props) => {
         </Text>
         <Ionicons name="search-sharp" size={24} color="white" />
         <Divider horizontal size="medium" />
-        <Feather name="more-vertical" size={24} color="white" />
+        <Menu />
       </View>
       <Divider size="small" />
       <View style={{ flexDirection: "row" }}>

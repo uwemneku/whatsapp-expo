@@ -1,61 +1,66 @@
-import { StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  StyleSheet,
+  View,
+  TouchableOpacity as Touchable_Opacity,
+  Pressable,
+} from "react-native";
 import React, { useContext, useState } from "react";
 import Animated, {
-  Extrapolate,
-  interpolate,
   runOnJS,
-  SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
-  useSharedValue,
   withTiming,
 } from "react-native-reanimated";
 import { TabRoutes } from "../../../types";
-import { TAB_SCREENS } from "../../../constants";
 import { Ionicons, MaterialIcons } from "@expo/vector-icons";
-import { CurrentTabContext } from "../../../context";
+import { CurrentTabScreenContext } from "../../../context";
 
 type icons = "add-ic-call" | "photo-camera" | "messenger";
 
+const TouchableOpacity = Animated.createAnimatedComponent(Pressable);
 const FAB = () => {
-  const activeTab = useSharedValue<TabRoutes>("Chat");
   const [currentIcon, setCurrentIcon] = useState<icons>("messenger");
-  const currentIndex = useContext(CurrentTabContext);
+  const currentTopTabScreen = useContext(CurrentTabScreenContext);
 
-  //This sets the value of the active tab based on the scroll offset
+  //Change the FAB icon when the user changes the tab
   useAnimatedReaction(
-    () => currentIndex.value,
-    (p) => {
-      activeTab.value = TAB_SCREENS[p];
-      runOnJS(setCurrentIcon)(getIcon(activeTab.value));
+    () => currentTopTabScreen.value,
+    (screenName) => {
+      const iconName = getIcon(screenName);
+      runOnJS(setCurrentIcon)(iconName);
     }
   );
 
-  const animatedPenStyle = useAnimatedStyle(() => ({
-    transform: [
-      {
-        translateY: withTiming(activeTab.value === "Status" ? -70 : 0, {
-          duration: 250,
-        }),
-      },
-    ],
-  }));
+  // Translate the pen icon into view when user is in the status screen
+  const animatedPenStyle = useAnimatedStyle(() => {
+    const offSetY = currentTopTabScreen.value === "Status" ? 0 : 70;
+    return {
+      transform: [{ translateY: withTiming(offSetY, { duration: 250 }) }],
+    };
+  });
 
   return (
     <View>
-      <View style={[styles.item, styles.green]}>
-        <MaterialIcons name={currentIcon} size={24} color="white" />
-      </View>
-      <Animated.View style={[styles.item, styles.pen, animatedPenStyle]}>
+      <TouchableOpacity
+        onPress={() => console.log("pen")}
+        style={[styles.item, styles.pen, animatedPenStyle]}
+        onLayout={({ nativeEvent: { layout } }) => console.log(layout)}
+      >
         <Ionicons name="ios-pencil-sharp" size={30} color="gray" />
-      </Animated.View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={[styles.item, styles.green]}
+        onPress={() => console.log("sss")}
+      >
+        <MaterialIcons name={currentIcon} size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 };
 
-const getIcon = (active: TabRoutes): icons => {
+const getIcon = (activeScreen: TabRoutes): icons => {
   "worklet";
-  switch (active) {
+  switch (activeScreen) {
     case "Chat":
       return "messenger";
     case "Status":
@@ -70,7 +75,7 @@ export default FAB;
 
 const styles = StyleSheet.create({
   item: {
-    position: "absolute",
+    position: "relative",
     width: 60,
     height: 60,
     bottom: 10,
@@ -78,6 +83,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     justifyContent: "center",
     alignItems: "center",
+    zIndex: 100,
   },
   green: {
     backgroundColor: "#008069",
@@ -85,6 +91,7 @@ const styles = StyleSheet.create({
   },
   pen: {
     backgroundColor: "rgba(225,225,225, 0.8)",
-    zIndex: 1,
+    zIndex: 2,
+    marginBottom: 10,
   },
 });
